@@ -1,0 +1,60 @@
+BÀI LÀM: THIẾT LẬP THƯ MỤC SMART-FARM BẰNG POWERSHELL
+Phần 1. Phân tích luồng IPO
+INPUT (Đầu vào)
+Thư mục Home (~)
+File mẫu template.ps1 trong Public
+Thông tin cấu hình cảm biến
+PROCESS (Xử lý)
+Tạo các thư mục bằng PowerShell.
+Tạo file .env trong config.
+Sao chép và đổi tên file mẫu.
+Kiểm tra cấu trúc và xử lý lỗi quyền truy cập.
+OUTPUT (Đầu ra)
+Cấu trúc smart-farm hoàn chỉnh.
+File pump_control.ps1 trong bin.
+File .env trong config.
+Danh sách file và thư mục để xác nhận kết quả.
+Phần 2. Nhật ký các câu lệnh PowerShell
+Bước 1: Tạo cấu trúc thư mục bằng một dòng lệnh
+New-Item -ItemType Directory -Path "$HOME\smart-farm\bin","$HOME\smart-farm\config","$HOME\smart-farm\data" -Force
+Giải thích:
+$HOME đại diện cho thư mục Home của người dùng hiện tại.
+New-Item -ItemType Directory tạo các thư mục.
+-Force giúp tránh lỗi khi các thư mục đã tồn tại.
+Bước 2: Tạo file .env trong config
+New-Item -ItemType File -Path "$HOME\smart-farm\config\.env" -Force
+Để đặt thuộc tính ẩn cho file:
+(Get-Item "$HOME\smart-farm\config\.env" -Force).Attributes = "Hidden"
+Tại sao Get-ChildItem thông thường không nhìn thấy .env?
+Trong PowerShell, file có thuộc tính Hidden thường bị ẩn khỏi kết quả của Get-ChildItem khi không có tham số -Force. Vì vậy, để liệt kê cả file ẩn, sử dụng:
+Get-ChildItem "$HOME\smart-farm\config" -Force
+Lưu ý bảo mật: Thuộc tính Hidden chỉ giúp file ít hiển thị hơn, không bảo vệ mật khẩu. Trong dự án thực tế, cần giới hạn quyền truy cập file và không đưa thông tin bí mật lên Git.
+Bước 3: Sao chép file mẫu và đổi tên trong một lệnh
+Giả sử thư mục Public nằm ngay trong Home:
+Copy-Item "$HOME\Public\template.ps1" "$HOME\smart-farm\bin\pump_control.ps1"
+Lệnh Copy-Item vừa sao chép file mẫu vừa đặt tên mới cho bản sao là pump_control.ps1.
+Nếu thư mục Public nằm ở vị trí khác trên máy, cần thay đường dẫn nguồn cho đúng.
+Bước 4: Kiểm tra toàn bộ cấu trúc thư mục
+Get-ChildItem "$HOME\smart-farm" -Recurse -Force
+-Recurse: liệt kê các thư mục và file ở tất cả cấp con.
+-Force: bao gồm cả file ẩn như .env.
+Kết quả mong đợi:
+smart-farm
+├── bin
+│   └── pump_control.ps1
+├── config
+│   └── .env
+└── data
+Phần 3. Xử lý lỗi “Access to the path is denied”
+Nếu gặp lỗi quyền truy cập khi sao chép file, thực hiện như sau:
+Mở menu Start.
+Tìm Windows PowerShell hoặc Terminal.
+Nhấp chuột phải và chọn Run as administrator.
+Chọn Yes trong cửa sổ User Account Control nếu được yêu cầu.
+Chạy lại lệnh sao chép.
+Có thể kiểm tra quyền hiện tại bằng:
+whoami
+Lưu ý: whoami chỉ hiển thị tài khoản hiện tại, không xác nhận PowerShell đang chạy với quyền quản trị. Chỉ nên nâng quyền khi thực sự cần thiết và được phép; nếu đường dẫn nguồn hoặc đích sai, chạy với quyền Administrator cũng không tự sửa được lỗi đó.
+Kết luận
+Qua bài tập, em đã vận dụng PowerShell để tạo thư mục, tạo file ẩn, sao chép và đổi tên file, cũng như kiểm tra cấu trúc dự án. Việc sử dụng $HOME, -Recurse và -Force giúp thao tác thuận tiện hơn, còn việc quản lý quyền truy cập giúp bảo vệ thông tin cấu hình của hệ thống Smart Farm.
+
